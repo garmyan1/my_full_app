@@ -50,8 +50,8 @@ class _GoldenPrizmaAppState extends State<GoldenPrizmaApp> {
     final seen = prefs.getBool('seenOnboarding') ?? false;
 
     if (seen) {
-      // Use the professional login page
-      return const ProfessionalLoginPage();
+      // Show main home page directly - TikTok style
+      return const MainHomePage();
     } else {
       return const OnboardingPage();
     }

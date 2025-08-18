@@ -43,12 +43,6 @@ class RouteGenerator {
           settings: RouteSettings(name: routeName),
         );
 
-      case AppRoutes.login:
-        return RouteAnimations.slideRoute(
-          const ProfessionalLoginPage(),
-          settings: RouteSettings(name: routeName),
-        );
-
       // Home Routes
       case AppRoutes.home:
         return RouteAnimations.fadeRoute(

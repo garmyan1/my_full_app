@@ -16,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
   bool isLoading = false;
   bool _rememberMe = false;
+  bool _showPassword = false;
 
   late LocalStorageService _storageService;
 
@@ -47,7 +48,8 @@ class _LoginPageState extends State<LoginPage> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        const SnackBar(
+            content: Text('Please enter both email and password')),
       );
       return;
     }
@@ -55,20 +57,25 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => isLoading = true);
 
     try {
-      // Save credentials if remember me is checked
-      await _storageService.saveCredentials(
-        email: email,
-        password: password,
-        remember: _rememberMe,
-      );
-
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      final user = userCredential.user;
 
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+      if (user != null) {
+        // Save credentials if remember me is checked
+        if (_rememberMe) {
+          await _storageService.saveCredentials(
+            email: email,
+            password: password,
+            remember: true,
+          );
+        }
+
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() => isLoading = false);
@@ -124,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: "Email",
+                    hintText: "Enter your email",
                     hintStyle: const TextStyle(color: Colors.white70),
                     prefixIcon: const Icon(Icons.email, color: Colors.white),
                     filled: true,
@@ -140,12 +147,23 @@ class _LoginPageState extends State<LoginPage> {
                 // Password Field
                 TextField(
                   controller: passwordController,
-                  obscureText: true,
+                  obscureText: !_showPassword,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: "Password",
+                    hintText: "Enter your password",
                     hintStyle: const TextStyle(color: Colors.white70),
-                    prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.white),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _showPassword ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _showPassword = !_showPassword;
+                        });
+                      },
+                    ),
                     filled: true,
                     fillColor: Colors.white.withValues(alpha: 0.1),
                     border: OutlineInputBorder(

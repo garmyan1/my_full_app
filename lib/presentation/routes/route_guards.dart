@@ -40,7 +40,8 @@ class RouteGuards {
   /// Get redirect route for unauthorized access
   static String getRedirectRoute(String attemptedRoute) {
     if (!isAuthenticated && requiresAuth(attemptedRoute)) {
-      return AppRoutes.login;
+      // Redirect to home instead of login - TikTok style
+      return AppRoutes.home;
     }
 
     return attemptedRoute;

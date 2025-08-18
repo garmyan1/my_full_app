@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'firebase_options.dart'; // Required for Firebase initialization
+import 'config/mapbox_config.dart';
 
 import 'presentation/pages/auth/login_page.dart';
 import 'presentation/pages/auth/register_page.dart';
@@ -11,9 +13,14 @@ import 'data/services/theme_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize Mapbox with access token
+  MapboxOptions.setAccessToken(MapboxConfig.accessToken);
 
   runApp(const GoldenPrizmaApp());
 }
@@ -26,7 +33,8 @@ class GoldenPrizmaApp extends StatelessWidget {
     final seen = prefs.getBool('seenOnboarding') ?? false;
 
     if (seen) {
-      return const LoginPage();
+      // Show main home page directly - TikTok style login system
+      return const MainHomePage();
     } else {
       return const OnboardingPage();
     }
@@ -90,8 +98,6 @@ class GoldenPrizmaApp extends StatelessWidget {
                 },
               ),
               routes: {
-                '/login': (context) => const LoginPage(),
-                '/register': (context) => const RegisterPage(),
                 '/home': (context) => const MainHomePage(),
               },
             );

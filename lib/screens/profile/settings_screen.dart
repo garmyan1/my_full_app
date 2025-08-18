@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/profile_data.dart';
 import '../finance/manage_subscription_screen.dart';
 import '../finance/buy_subscription_screen.dart';
@@ -16,15 +17,15 @@ class SettingsScreen extends StatelessWidget {
         phoneNumber: '+964 785 312 3668',
         profileImageUrl:
             'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
-        isPremium: false, // Default to non-premium to show buy subscription box
+        isPremium: false,
       ),
-      child: const TelegramSettingsPage(),
+      child: const TikTokStyleSettingsPage(),
     );
   }
 }
 
-class TelegramSettingsPage extends StatelessWidget {
-  const TelegramSettingsPage({super.key});
+class TikTokStyleSettingsPage extends StatelessWidget {
+  const TikTokStyleSettingsPage({super.key});
 
   void _showLogoutDialog(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -33,39 +34,57 @@ class TelegramSettingsPage extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey[900] : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text(
-            'Log Out',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            'Sign Out',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+            ),
           ),
           content: Text(
-            'Are you sure you want to log out?',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+            'Are you sure you want to sign out?',
+            style: TextStyle(
+              color: isDark ? Colors.grey[300] : Colors.grey[600],
+              fontSize: 16,
+            ),
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Cancel',
                 style: TextStyle(
                   color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                // Navigate back to login page and clear all routes
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
-                  (Route<dynamic> route) => false,
-                );
+                await FirebaseAuth.instance.signOut();
+                if (context.mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/home',
+                    (Route<dynamic> route) => false,
+                  );
+                }
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
               ),
-              child: const Text('Log Out'),
+              child: const Text(
+                'Sign Out',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         );
@@ -73,116 +92,107 @@ class TelegramSettingsPage extends StatelessWidget {
     );
   }
 
-  ProfileSubscriptionData get _profileSubscriptionData =>
-      ProfileSubscriptionData(
-        title: 'Telegram Premium',
-        status: 'Active',
-        benefits: <String>[
-          'No Ads',
-          'Larger Uploads (4 GB)',
-          'Faster Downloads',
-          'Exclusive Stickers',
-          'Voice-to-Text for Voice Messages',
-          'Unique Reaction Emojis',
-        ],
-        actionText: 'Manage Subscription',
-        actionIcon: Icons.arrow_forward_ios,
-        expiryDate: '2025-08-15',
-        price: '\$4.99/month',
-        signatureText: 'Premium',
-      );
-
   List<SettingsSectionData> _settingsSections(BuildContext context) =>
       <SettingsSectionData>[
-        SettingsSectionData(
-          title: "General",
-          children: <SettingTileData>[
-            SettingTileData(
-                icon: Icons.person_outline,
-                title: 'My Profile',
-                description: 'Edit your profile info',
-                trailingIcon: Icons.chevron_right),
-            SettingTileData(
-                icon: Icons.bookmark_outline,
-                title: 'Saved Messages',
-                description: 'View your saved items',
-                trailingIcon: Icons.chevron_right),
-            SettingTileData(
-                icon: Icons.phone_outlined,
-                title: 'Recent Calls',
-                description: 'Check your call history',
-                trailingIcon: Icons.chevron_right),
-            SettingTileData(
-                icon: Icons.devices_other_outlined,
-                title: 'Devices',
-                trailing: '4',
-                description: 'Manage active sessions',
-                trailingIcon: Icons.chevron_right),
-            SettingTileData(
-                icon: Icons.folder_open_outlined,
-                title: 'Chat Folders',
-                description: 'Organize your chats',
-                trailingIcon: Icons.chevron_right),
-          ],
-        ),
         SettingsSectionData(
           title: "Account",
           children: <SettingTileData>[
             SettingTileData(
-                icon: Icons.person_outline,
-                title: 'Edit Profile',
-                description: 'Change your name and username',
-                trailingIcon: Icons.chevron_right),
+              icon: Icons.person_outline,
+              title: 'Edit Profile',
+              description: 'Change your name and username',
+              trailingIcon: Icons.chevron_right,
+            ),
             SettingTileData(
-                icon: Icons.lock_open_outlined,
-                title: 'Privacy Controls',
-                description: 'Manage your account privacy',
-                trailingIcon: Icons.chevron_right),
+              icon: Icons.lock_open_outlined,
+              title: 'Privacy Controls',
+              description: 'Manage your account privacy',
+              trailingIcon: Icons.chevron_right,
+            ),
             SettingTileData(
-                icon: Icons.phone_android_outlined,
-                title: 'Phone Number',
-                description: 'Update your contact number',
-                trailingIcon: Icons.chevron_right),
+              icon: Icons.phone_android_outlined,
+              title: 'Phone Number',
+              description: 'Update your contact number',
+              trailingIcon: Icons.chevron_right,
+            ),
             SettingTileData(
-                icon: Icons.vpn_key_outlined,
-                title: 'Two-Step Verification',
-                description: 'Add an extra layer of security',
-                trailingIcon: Icons.chevron_right),
-            SettingTileData(
-                icon: Icons.delete_outline,
-                title: 'Delete Account',
-                description: 'Permanently remove your account',
-                trailingIcon: Icons.chevron_right),
+              icon: Icons.vpn_key_outlined,
+              title: 'Two-Step Verification',
+              description: 'Add an extra layer of security',
+              trailingIcon: Icons.chevron_right,
+            ),
           ],
         ),
         SettingsSectionData(
           title: "Preferences",
           children: <SettingTileData>[
             SettingTileData(
-                icon: Icons.notifications_none_outlined,
-                title: 'Notifications and Sounds',
-                description: 'Customize alerts'),
+              icon: Icons.notifications_none_outlined,
+              title: 'Notifications',
+              description: 'Customize alerts and sounds',
+              trailingIcon: Icons.chevron_right,
+            ),
             SettingTileData(
-                icon: Icons.lock_outline,
-                title: 'Privacy and Security',
-                description: 'Control your privacy settings'),
+              icon: Icons.lock_outline,
+              title: 'Privacy & Security',
+              description: 'Control your privacy settings',
+              trailingIcon: Icons.chevron_right,
+            ),
             SettingTileData(
-                icon: Icons.storage_outlined,
-                title: 'Data and Storage',
-                description: 'Manage media and cache'),
+              icon: Icons.storage_outlined,
+              title: 'Data & Storage',
+              description: 'Manage media and cache',
+              trailingIcon: Icons.chevron_right,
+            ),
+            SettingTileData(
+              icon: Icons.language_outlined,
+              title: 'Language',
+              description: 'Change app language',
+              trailingIcon: Icons.chevron_right,
+            ),
+          ],
+        ),
+        SettingsSectionData(
+          title: "Support",
+          children: <SettingTileData>[
+            SettingTileData(
+              icon: Icons.help_outline,
+              title: 'Help Center',
+              description: 'Get help and support',
+              trailingIcon: Icons.chevron_right,
+            ),
+            SettingTileData(
+              icon: Icons.feedback_outlined,
+              title: 'Report a Problem',
+              description: 'Report bugs or issues',
+              trailingIcon: Icons.chevron_right,
+            ),
+            SettingTileData(
+              icon: Icons.info_outline,
+              title: 'About',
+              description: 'App version and information',
+              trailingIcon: Icons.chevron_right,
+            ),
           ],
         ),
         SettingsSectionData(
           title: "Account Actions",
           children: <SettingTileData>[
             SettingTileData(
-                icon: Icons.logout,
-                title: 'Log Out',
-                description: 'Sign out from this account',
-                trailingIcon: Icons.chevron_right,
-                onTap: () {
-                  _showLogoutDialog(context);
-                }),
+              icon: Icons.delete_outline,
+              title: 'Delete Account',
+              description: 'Permanently remove your account',
+              trailingIcon: Icons.chevron_right,
+              isDestructive: true,
+            ),
+            SettingTileData(
+              icon: Icons.logout,
+              title: 'Sign Out',
+              description: 'Sign out from this account',
+              trailingIcon: Icons.chevron_right,
+              isDestructive: true,
+              onTap: () => _showLogoutDialog(context),
+            ),
           ],
         ),
       ];
@@ -193,187 +203,99 @@ class TelegramSettingsPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: isDark ? Colors.black : const Color(0xFFF8F8F8),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: isDark ? Colors.black : Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Theme.of(context).appBarTheme.foregroundColor,
+            color: isDark ? Colors.white : Colors.black,
+            size: 24,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Settings and Privacy',
+          'Settings',
           style: TextStyle(
-            color: Theme.of(context).appBarTheme.foregroundColor,
+            color: isDark ? Colors.white : Colors.black,
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: 20,
           ),
         ),
+        centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         children: <Widget>[
-          // Telegram logo
-          Center(
-            child: Container(
-              margin: EdgeInsets.zero,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade700,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Text(
-                'TELEGRAM',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          /// Profile Section Box
+          // Profile Header Card
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: isDark ? Colors.grey[800] : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark ? Colors.grey[600]! : Colors.grey.shade300,
-              ),
-              boxShadow: <BoxShadow>[
+              color: isDark ? Colors.grey[900] : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
                 BoxShadow(
-                  color: (isDark ? Colors.black : Colors.black)
-                      .withOpacity(isDark ? 0.3 : 0.05),
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-                BoxShadow(
-                  color: Colors.blue.withOpacity(0.15),
-                  spreadRadius: 0,
+                  color: Colors.black.withOpacity(0.05),
                   blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Column(
+            child: Row(
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 35,
-                      backgroundImage:
-                          NetworkImage(profileData.profileImageUrl),
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFFE2C55),
+                      width: 3,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            profileData.name,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            profileData.username,
-                            style: TextStyle(
-                              color: isDark
-                                  ? Colors.grey[400]
-                                  : Colors.grey.shade700,
-                              fontSize: 10,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            profileData.phoneNumber,
-                            style: TextStyle(
-                              color: isDark
-                                  ? Colors.grey[400]
-                                  : Colors.grey.shade700,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 32,
+                    backgroundImage: NetworkImage(profileData.profileImageUrl),
+                  ),
                 ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextButton.icon(
-                          onPressed: () {
-                            profileData.updateProfile(
-                                newProfileImageUrl:
-                                    'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg');
-                          },
-                          icon: Icon(
-                            Icons.camera_alt_outlined,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          label: Text(
-                            "Change Photo",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontSize: 12,
-                            ),
-                          ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        profileData.name,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
                         ),
                       ),
-                      // Demo button to toggle premium status
-                      TextButton.icon(
-                        onPressed: () {
-                          if (profileData.isPremium) {
-                            profileData.deactivatePremium();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Premium deactivated (Demo)')),
-                            );
-                          } else {
-                            profileData.activatePremium();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Premium activated! (Demo)')),
-                            );
-                          }
-                        },
-                        icon: Icon(
-                          profileData.isPremium
-                              ? Icons.diamond
-                              : Icons.diamond_outlined,
-                          color: profileData.isPremium
-                              ? Colors.amber
-                              : Colors.grey,
+                      const SizedBox(height: 4),
+                      Text(
+                        profileData.username,
+                        style: TextStyle(
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          fontSize: 16,
                         ),
-                        label: Text(
-                          profileData.isPremium ? "Premium" : "Demo",
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFE2C55),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          'Edit Profile',
                           style: TextStyle(
-                            color: profileData.isPremium
-                                ? Colors.amber
-                                : Colors.grey,
-                            fontSize: 10,
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -386,504 +308,204 @@ class TelegramSettingsPage extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Subscription Box - shows different content based on premium status
-          profileData.isPremium
-              ? ProfileSubscriptionBox(data: _profileSubscriptionData)
-              : const BuySubscriptionBox(),
+          // Settings Sections
+          ..._settingsSections(context).map((section) => _buildSettingsSection(
+                context,
+                section,
+                isDark,
+              )),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 40),
 
-          /// Settings Groups
-          ..._settingsSections(context)
-              .map<Widget>(
-                  (SettingsSectionData data) => SettingsSection(data: data))
-              .expand<Widget>((Widget widget) =>
-                  <Widget>[widget, const SizedBox(height: 16)])
-              .take(_settingsSections(context).length * 2 - 1)
-              .toList(),
-          const SizedBox(height: 14),
-        ],
-      ),
-    );
-  }
-}
-
-class AccountItem extends StatelessWidget {
-  const AccountItem({required this.data, super.key});
-
-  final AccountItemData data;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return ListTile(
-      leading: CircleAvatar(backgroundImage: NetworkImage(data.imageUrl)),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            data.title,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 12,
-            ),
-          ),
-          if (data.description != null)
-            Text(
-              data.description!,
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey.shade600,
-                fontSize: 10,
-              ),
-            ),
-        ],
-      ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          data.badge,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      onTap: () {},
-    );
-  }
-}
-
-// ProfileSubscriptionBox widget with redesigned style
-class ProfileSubscriptionBox extends StatelessWidget {
-  const ProfileSubscriptionBox({required this.data, super.key});
-
-  final ProfileSubscriptionData data;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: <Color>[
-            Color(0xFF1E3C72), // Blue gradient
-            Color(0xFF2A5298), // Lighter blue
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: (isDark ? Colors.black : Colors.black).withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: const Color(0xFF2A5298).withOpacity(0.4),
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  const Icon(Icons.diamond, color: Colors.amber, size: 28),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          data.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          data.status,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ManageSubscriptionScreen(
-                        onCancelComplete: () {
-                          // Update the current screen's ProfileData
-                          final profileData =
-                              Provider.of<ProfileData>(context, listen: false);
-                          profileData.deactivatePremium();
-                        },
-                      ),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 8.0, horizontal: 16.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Icon(data.actionIcon,
-                          size: 16, color: Colors.cyanAccent.shade100),
-                      const SizedBox(width: 8),
-                      Text(
-                        data.actionText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.cyanAccent.shade100,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          // Signature on top right box
-          if (data.signatureText != null)
-            Positioned(
-              top: 4,
-              right: 4,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  data.signatureText!,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// Buy Subscription Box for non-premium users
-class BuySubscriptionBox extends StatelessWidget {
-  const BuySubscriptionBox({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: <Color>[
-            Color(0xFF1E3C72), // Blue gradient
-            Color(0xFF2A5298), // Lighter blue
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: (isDark ? Colors.black : Colors.black).withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-          BoxShadow(
-            color: const Color(0xFF2A5298).withOpacity(0.4),
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              const Icon(Icons.diamond_outlined, color: Colors.amber, size: 28),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'Telegram Premium',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Unlock exclusive features',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'UPGRADE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Benefits preview
-          const Row(
-            children: <Widget>[
-              Icon(Icons.block, color: Colors.white70, size: 16),
-              SizedBox(width: 8),
-              Text('No Ads',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
-              SizedBox(width: 20),
-              Icon(Icons.cloud_upload, color: Colors.white70, size: 16),
-              SizedBox(width: 8),
-              Text('4GB Uploads',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Row(
-            children: <Widget>[
-              Icon(Icons.speed, color: Colors.white70, size: 16),
-              SizedBox(width: 8),
-              Text('Faster Downloads',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
-              SizedBox(width: 20),
-              Icon(Icons.emoji_emotions, color: Colors.white70, size: 16),
-              SizedBox(width: 8),
-              Text('Premium Stickers',
-                  style: TextStyle(color: Colors.white70, fontSize: 12)),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Buy button
-          InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => BuySubscriptionScreen(
-                    onPurchaseComplete: () {
-                      // Update the current screen's ProfileData
-                      final profileData =
-                          Provider.of<ProfileData>(context, listen: false);
-                      profileData.activatePremium();
-                    },
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(Icons.shopping_cart,
-                      size: 16, color: Colors.white),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Get Premium',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.arrow_forward,
-                      size: 16, color: Colors.white.withOpacity(0.8)),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class SettingsSection extends StatelessWidget {
-  const SettingsSection({required this.data, super.key});
-
-  final SettingsSectionData data;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[800] : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? Colors.grey[600]! : Colors.grey.shade300,
-        ),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: (isDark ? Colors.black : Colors.black)
-                .withOpacity(isDark ? 0.3 : 0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+          // App Version
+          Center(
             child: Text(
-              data.title.toUpperCase(),
+              'TikTok Clone v1.0.0',
               style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey.shade700,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.grey[600] : Colors.grey[500],
+                fontSize: 14,
               ),
             ),
           ),
-          ...data.children
-              .map<Widget>(
-                  (SettingTileData tileData) => SettingTile(data: tileData))
-              .expand<Widget>((Widget widget) => <Widget>[
-                    widget,
-                    Divider(
-                      color: isDark ? Colors.grey[600] : Colors.grey.shade200,
-                      height: 1,
-                    )
-                  ])
-              .take(data.children.length * 2 - 1)
-              .toList(),
         ],
       ),
     );
   }
-}
 
-class SettingTile extends StatelessWidget {
-  const SettingTile({required this.data, super.key});
-
-  final SettingTileData data;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final List<Widget> trailingWidgets = <Widget>[];
-
-    // Add trailing text if present
-    if (data.trailing != null) {
-      trailingWidgets.add(
-        Text(
-          data.trailing!,
-          style: TextStyle(
-            color: isDark ? Colors.grey[400] : Colors.grey.shade600,
-          ),
-        ),
-      );
-    }
-
-    // Add trailing icon if present
-    if (data.trailingIcon != null) {
-      if (trailingWidgets.isNotEmpty) {
-        trailingWidgets.add(const SizedBox(width: 4));
-      }
-      trailingWidgets.add(
-        Icon(
-          data.trailingIcon!,
-          color: isDark ? Colors.grey[400] : Colors.grey.shade600,
-          size: 18,
-        ),
-      );
-    }
-
-    return ListTile(
-      leading: Icon(
-        data.icon,
-        color: isDark ? Colors.grey[400] : Colors.grey.shade700,
-      ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            data.title,
+  Widget _buildSettingsSection(
+    BuildContext context,
+    SettingsSectionData section,
+    bool isDark,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            section.title.toUpperCase(),
             style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 11,
+              color: isDark ? Colors.grey[500] : Colors.grey[600],
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
             ),
           ),
-          if (data.description != null)
-            Text(
-              data.description!,
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey.shade600,
-                fontSize: 10,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[900] : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
-            ),
-        ],
+            ],
+          ),
+          child: Column(
+            children: section.children.map((tile) {
+              final isLast = section.children.last == tile;
+              return Column(
+                children: [
+                  _buildSettingTile(context, tile, isDark),
+                  if (!isLast)
+                    Divider(
+                      height: 1,
+                      indent: 56,
+                      color: isDark ? Colors.grey[800] : Colors.grey[200],
+                    ),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildSettingTile(
+    BuildContext context,
+    SettingTileData tile,
+    bool isDark,
+  ) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: tile.isDestructive
+              ? Colors.red.withOpacity(0.1)
+              : (isDark ? Colors.grey[800] : Colors.grey[100]),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(
+          tile.icon,
+          color: tile.isDestructive
+              ? Colors.red
+              : (isDark ? Colors.white : Colors.black87),
+          size: 20,
+        ),
       ),
-      trailing: trailingWidgets.isNotEmpty
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: trailingWidgets,
+      title: Text(
+        tile.title,
+        style: TextStyle(
+          color: tile.isDestructive
+              ? Colors.red
+              : (isDark ? Colors.white : Colors.black87),
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: tile.description != null
+          ? Text(
+              tile.description!,
+              style: TextStyle(
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+                fontSize: 14,
+              ),
             )
           : null,
-      onTap: data.onTap ?? () {},
+      trailing: tile.trailing != null
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFE2C55),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                tile.trailing!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : tile.trailingIcon != null
+              ? Icon(
+                  tile.trailingIcon,
+                  color: isDark ? Colors.grey[400] : Colors.grey[600],
+                  size: 20,
+                )
+              : null,
+      onTap: tile.onTap,
     );
   }
+}
+
+// Data Models
+class SettingsSectionData {
+  final String title;
+  final List<SettingTileData> children;
+
+  SettingsSectionData({
+    required this.title,
+    required this.children,
+  });
+}
+
+class SettingTileData {
+  final IconData icon;
+  final String title;
+  final String? description;
+  final IconData? trailingIcon;
+  final String? trailing;
+  final VoidCallback? onTap;
+  final bool isDestructive;
+
+  SettingTileData({
+    required this.icon,
+    required this.title,
+    this.description,
+    this.trailingIcon,
+    this.trailing,
+    this.onTap,
+    this.isDestructive = false,
+  });
+}
+
+class ProfileSubscriptionData {
+  final String title;
+  final String status;
+  final List<String> benefits;
+  final String actionText;
+  final IconData actionIcon;
+  final String expiryDate;
+  final String price;
+  final String signatureText;
+
+  ProfileSubscriptionData({
+    required this.title,
+    required this.status,
+    required this.benefits,
+    required this.actionText,
+    required this.actionIcon,
+    required this.expiryDate,
+    required this.price,
+    required this.signatureText,
+  });
 }

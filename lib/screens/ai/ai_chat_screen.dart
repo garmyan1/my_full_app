@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({Key? key}) : super(key: key);
@@ -88,6 +89,193 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if user is authenticated
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      return _buildUnauthenticatedAI();
+    }
+    
+    return _buildAuthenticatedAI();
+  }
+
+  Widget _buildUnauthenticatedAI() {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // AI Icon
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFB700FF), Color(0xFF8A2BE2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.smart_toy,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                ),
+                
+                const SizedBox(height: 24),
+                
+                Text(
+                  'Unlock AI Assistant',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 12),
+                
+                Text(
+                  'Sign in to access our advanced AI assistant and get personalized help',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[400]
+                        : Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // Login button
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () => _showLoginRegisterModal(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFB700FF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Sign In to Chat',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Continue as guest
+                TextButton(
+                  onPressed: () {
+                    // Just close the modal or navigate back
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Continue Browsing',
+                    style: TextStyle(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[400]
+                          : Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLoginRegisterModal(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext bc) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[900]
+                : Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 20),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[600]
+                      : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Title
+              Text(
+                'Join the Community',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
+              ),
+              
+              const SizedBox(height: 8),
+              
+              Text(
+                'Sign in or create an account to access AI features',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[400]
+                      : Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              
+              const SizedBox(height: 30),
+              
+              // Login/Register Form
+              Expanded(
+                child: _LoginRegisterForm(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAuthenticatedAI() {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -98,56 +286,35 @@ class _AIChatScreenState extends State<AIChatScreen> {
             Container(
               width: 40,
               height: 40,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.blue, Colors.purple],
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [Color(0xFFB700FF), Color(0xFF8A2BE2)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20),
               ),
-              child: const Center(
-                child: Text(
-                  'AI',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              child: const Icon(
+                Icons.smart_toy,
+                color: Colors.white,
+                size: 24,
               ),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AI Assistant',
-                  style: TextStyle(
-                    color: Theme.of(context).appBarTheme.foregroundColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Text(
-                  'Online',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
+            const Text(
+              'AI Assistant',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
-        ),
-        iconTheme: IconThemeData(
-          color: Theme.of(context).appBarTheme.foregroundColor,
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
-              _showOptionsMenu(context);
+              // Show AI settings or options
             },
           ),
         ],
@@ -160,18 +327,363 @@ class _AIChatScreenState extends State<AIChatScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
-                return _buildMessageBubble(_messages[index]);
+                final message = _messages[index];
+                return ChatBubble(message: message);
               },
             ),
           ),
-          _buildMessageInput(),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              border: Border(
+                top: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]!
+                      : Colors.grey[300]!,
+                  width: 0.5,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: 'Type your message...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                    ),
+                    maxLines: null,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => _sendMessage(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFB700FF), Color(0xFF8A2BE2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: IconButton(
+                    onPressed: _sendMessage,
+                    icon: const Icon(Icons.send, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildMessageBubble(ChatMessage message) {
+// Login/Register Form Widget
+class _LoginRegisterForm extends StatefulWidget {
+  @override
+  State<_LoginRegisterForm> createState() => _LoginRegisterFormState();
+}
+
+class _LoginRegisterFormState extends State<_LoginRegisterForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  bool _isLogin = true;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (_isLogin) {
+        await _login();
+      } else {
+        await _register();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _login() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+    
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Successfully logged in!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  Future<void> _register() async {
+    final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+    
+    if (credential.user != null && _nameController.text.isNotEmpty) {
+      await credential.user!.updateDisplayName(_nameController.text.trim());
+    }
+    
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Successfully registered!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            // Name field (only for register)
+            if (!_isLogin) ...[
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.person),
+                ),
+                validator: (value) {
+                  if (!_isLogin && (value == null || value.isEmpty)) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+            
+            // Email field
+            TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.email),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Password field
+            TextFormField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.lock),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                if (value.length < 6) {
+                  return 'Password must be at least 6 characters';
+                }
+                return null;
+              },
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Submit button
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _submitForm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB700FF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        _isLogin ? 'Sign In' : 'Sign Up',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Toggle between login and register
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _isLogin = !_isLogin;
+                  _formKey.currentState?.reset();
+                });
+              },
+              child: Text(
+                _isLogin
+                    ? 'Don\'t have an account? Sign Up'
+                    : 'Already have an account? Sign In',
+                style: TextStyle(
+                  color: const Color(0xFFB700FF),
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Forgot password
+            if (_isLogin)
+              TextButton(
+                onPressed: () async {
+                  if (_emailController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please enter your email first'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                    return;
+                  }
+                  
+                  try {
+                    await FirebaseAuth.instance.sendPasswordResetEmail(
+                      email: _emailController.text.trim(),
+                    );
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Password reset email sent!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Chat Message Model
+class ChatMessage {
+  final String text;
+  final bool isUser;
+  final DateTime timestamp;
+
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    required this.timestamp,
+  });
+}
+
+// Chat Bubble Widget
+class ChatBubble extends StatelessWidget {
+  final ChatMessage message;
+
+  const ChatBubble({
+    super.key,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -183,22 +695,19 @@ class _AIChatScreenState extends State<AIChatScreen> {
             Container(
               width: 32,
               height: 32,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.blue, Colors.purple],
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFFB700FF), Color(0xFF8A2BE2)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                shape: BoxShape.circle,
               ),
               child: const Center(
-                child: Text(
-                  'AI',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Icon(
+                  Icons.smart_toy,
+                  color: Colors.white,
+                  size: 16,
                 ),
               ),
             ),
@@ -209,7 +718,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: message.isUser
-                    ? Theme.of(context).primaryColor
+                    ? const Color(0xFFB700FF)
                     : (isDark ? Colors.grey[800] : Colors.white),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
@@ -251,10 +760,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 16,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-              child: Icon(
+              backgroundColor: const Color(0xFFB700FF).withOpacity(0.1),
+              child: const Icon(
                 Icons.person,
-                color: Theme.of(context).primaryColor,
+                color: Color(0xFFB700FF),
                 size: 16,
               ),
             ),
@@ -264,165 +773,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     );
   }
 
-  Widget _buildMessageInput() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[900] : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: (isDark ? Colors.black : Colors.black)
-                .withOpacity(isDark ? 0.3 : 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: TextField(
-                controller: _messageController,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: 'Type your message...',
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  ),
-                  border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                maxLines: null,
-                onSubmitted: (_) => _sendMessage(),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue, Colors.purple],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-              onPressed: _sendMessage,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
-
-  void _showOptionsMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 10),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          ListTile(
-            leading: const Icon(Icons.delete_outline),
-            title: const Text('Clear Chat'),
-            onTap: () {
-              Navigator.pop(context);
-              _clearChat();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.help_outline),
-            title: const Text('Help & Tips'),
-            onTap: () {
-              Navigator.pop(context);
-              _showHelpDialog();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings_outlined),
-            title: const Text('AI Settings'),
-            onTap: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('AI Settings coming soon!')),
-              );
-            },
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  void _clearChat() {
-    setState(() {
-      _messages.clear();
-      _messages.add(ChatMessage(
-        text: "Chat cleared! How can I help you?",
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
-    });
-  }
-
-  void _showHelpDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('AI Chat Help'),
-        content: const Text(
-          'Tips for chatting with AI:\n\n'
-          '• Ask clear, specific questions\n'
-          '• You can ask for help, information, or advice\n'
-          '• Try starting conversations with greetings\n'
-          '• Use the menu to clear chat history\n'
-          '• AI responses are simulated for demo purposes',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Got it'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ChatMessage {
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
-
-  ChatMessage({
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-  });
 }
