@@ -1,0 +1,22 @@
+workflows:
+  ios-workflow:
+    name: iOS Workflow
+    max_build_duration: 60
+    environment:
+      vars:
+        FLUTTER_CHANNEL: stable
+    scripts:
+      - name: Install dependencies
+        script: |
+          flutter pub get
+      - name: Build iOS
+        script: |
+          flutter build ios --release
+    artifacts:
+      - build/ios/iphoneos/Runner.app
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
+        on_success: always
+        on_failure: always
