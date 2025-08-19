@@ -1,6 +1,6 @@
 workflows:
-  android-workflow:
-    name: Android Workflow
+  ios-workflow:
+    name: iOS Workflow
     max_build_duration: 60
     environment:
       vars:
@@ -9,15 +9,11 @@ workflows:
       - name: Install dependencies
         script: |
           flutter pub get
-      - name: Build Android
+      - name: Build iOS
         script: |
-          flutter build apk --release
-          # OR for app bundle:
-          # flutter build appbundle --release
+          flutter build ios --release
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
-      # OR for app bundle:
-      # - build/app/outputs/bundle/release/app-release.aab
+      - build/ios/iphoneos/Runner.app
     publishing:
       email:
         recipients:
